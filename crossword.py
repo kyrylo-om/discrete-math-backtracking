@@ -1,6 +1,7 @@
 '''
 crossword module
 '''
+import argparse
 import tkinter as tk
 from time import sleep
 
@@ -207,8 +208,23 @@ class Crossword:
 
 
 
+def parse_args():
+    '''
+    function for argparse
+    '''
+    parser = argparse.ArgumentParser(description="Crossword Puzzle Solver")
+    parser.add_argument("--grid", type=str, help="Grid representation of the crossword", required=False)
+    parser.add_argument("--words", type=str, nargs="+", help="List of words to be placed in the crossword", required=False)
+    return parser.parse_args()
+
 if __name__ == "__main__":
-    initial_grid = [
+    args = parse_args()
+
+    if args.grid and args.words:
+        initial_grid = [list(row) for row in args.grid.split(",")]
+        words = args.words
+    else:
+        initial_grid = [
         ['1', '1', '1', '1', '1', '1', '0', '1', '1', '1'],
         ['1', '0', '1', '0', '1', '1', '1', '1', '1', '0'],
         ['1', '1', '1', '1', '1', '1', '0', '1', '1', '1'],
@@ -219,18 +235,19 @@ if __name__ == "__main__":
         ['1', '1', '1', '0', '1', '1', '1', '1', '1', '1'],
         ['0', '1', '1', '1', '1', '1', '0', '1', '0', '1'],
         ['1', '1', '1', '0', '1', '1', '1', '1', '1', '1'],
-    ]
+        ]
+        words = [
+            'LIAR', 'LESION', 'ABATES', 'BUS', 
+            'MOLES', 'TEE', 'ENE', 'ISIS',
+            'MADE', 'PSALMS', 'TIS', 'RUES',
+            'ANNALS', 'RASP', 'TUNES', 'MIEN',
+            'ASSAIL', 'TENSE', 'BAT', 'GEN',
+            'ATE', 'TEN', 'TUB', 'TREE', 'SPA',
+            'RAGE', 'SPARSE', 'TAPE', 'OMEGA', 'NOSE',
+            'BET', 'USE'
+        ]
 
-    words = [
-        'LIAR', 'LESION', 'ABATES', 'BUS', 
-        'MOLES', 'TEE', 'ENE', 'ISIS',
-        'MADE', 'PSALMS', 'TIS', 'RUES',
-        'ANNALS', 'RASP', 'TUNES', 'MIEN',
-        'ASSAIL', 'TENSE', 'BAT', 'GEN',
-        'ATE', 'TEN', 'TUB', 'TREE', 'SPA',
-        'RAGE', 'SPARSE', 'TAPE', 'OMEGA', 'NOSE',
-        'BET', 'USE'
-    ]
+
 
     root = tk.Tk()
     app = Crossword(root, initial_grid, words)
