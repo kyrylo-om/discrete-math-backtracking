@@ -1,6 +1,5 @@
 import tkinter as tk
 import copy
-from collections import deque
 
 CELL_SIZE = 50
 MOVES = [(-1, 0), (1, 0), (0, -1), (0, 1)]
