@@ -1,6 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-import os
+import argparse
 import random
 import json
 
@@ -81,13 +81,32 @@ class Graph:
         else:
             return None
 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="K-coloring of a graph")
+    parser.add_argument("-k", type=int, help="The number of colors to color the graph into", required=True)
+    parser.add_argument("-n", type=int, help="Number of nodes in the graph", required=True)
+    parser.add_argument("-c", type=float, help="Connectedness of the graph", required=True)
+    parser.add_argument("-p", "--preview", action='store_true', help="Render the graph as an image before coloring")
 
-G = Graph()
-G.generate(15, 0.2)
+    args = parser.parse_args()
 
-coloring = G.k_coloring(4)
+    if args.k and args.k < 1 or args.k == 0:
+        parser.error("Number of colors must be at least 1.")
+    if args.n and args.n < 1 or args.n == 0:
+        parser.error("Number of nodes must be at least 1.")
+    if args.c and (args.c < 0 or args.c > 1):
+        parser.error("Connectedness must be between 0 and 1.")
 
-if coloring:
-    print("Успішне розфарбування:", coloring)
-else:
-    print(f"Неможливо розфарбувати граф.")
+    graph = Graph()
+    graph.generate(args.n, args.c)
+
+    if args.preview:
+        graph.render()
+
+    coloring = graph.k_coloring(args.k)
+
+    if coloring:
+        print("Coloring successful:", coloring)
+        print("You can view the step-by-step coloring process by running k-coloring_visualizer.html")
+    else:
+        print("The graph cannot be colored with", args.k, "colors.")
