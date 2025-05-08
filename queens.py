@@ -95,41 +95,34 @@ class BacktrackingVisualizer:
         self.root.mainloop()
 
     def setup_ui(self):
-        # Input Frame
         input_frame = tk.Frame(self.root)
         input_frame.grid(row=0, column=0, padx=10, pady=10)
 
-        # Queens input
         tk.Label(input_frame, text="Кількість ферзів:").grid(
             row=0, column=0, sticky="w"
         )
         self.queens_entry = tk.Entry(input_frame)
         self.queens_entry.grid(row=0, column=1, padx=5)
 
-        # Rows input
         tk.Label(input_frame, text="Рядків:").grid(row=1, column=0, sticky="w")
         self.rows_entry = tk.Entry(input_frame)
         self.rows_entry.grid(row=1, column=1, padx=5)
 
-        # Columns input
         tk.Label(input_frame, text="Стовпців:").grid(row=2, column=0, sticky="w")
         self.cols_entry = tk.Entry(input_frame)
         self.cols_entry.grid(row=2, column=1, padx=5)
 
-        # Control buttons
         self.start_btn = tk.Button(
             input_frame, text="Старт", command=self.start_visualization
         )
         self.start_btn.grid(row=3, column=0, columnspan=2, pady=5)
 
-        # Speed control
         self.speed_slider = tk.Scale(
             self.root, from_=0, to=1000, label="Швидкість (мс)", orient=tk.HORIZONTAL
         )
         self.speed_slider.set(500)
         self.speed_slider.grid(row=1, column=0, sticky="we", padx=10)
 
-        # Canvas placeholder (will be recreated on start)
         self.canvas = None
 
     def validate_inputs(self):
@@ -159,29 +152,25 @@ class BacktrackingVisualizer:
 
         n, rows, cols = params
 
-        # Clear previous canvas if exists
         if self.canvas:
             self.canvas.destroy()
 
-        # Create new canvas with proper size
         self.canvas = tk.Canvas(
             self.root, width=cols * CELL_SIZE, height=rows * CELL_SIZE
         )
         self.canvas.grid(row=2, column=0, padx=10, pady=10)
 
-        # Disable inputs during visualization
         self.start_btn.config(state=tk.DISABLED)
         self.queens_entry.config(state=tk.DISABLED)
         self.rows_entry.config(state=tk.DISABLED)
         self.cols_entry.config(state=tk.DISABLED)
 
-        # Start visualization in new thread to keep UI responsive
         self.root.after(100, lambda: self.run_visualization(n, rows, cols))
 
     def run_visualization(self, n, rows, cols):
         delay = self.speed_slider.get() / 1000
         find_all_queens(n, rows, cols, callback=self.draw_board, delay=delay)
-        # Re-enable inputs after completion
+
         self.start_btn.config(state=tk.NORMAL)
         self.queens_entry.config(state=tk.NORMAL)
         self.rows_entry.config(state=tk.NORMAL)

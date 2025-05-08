@@ -1,14 +1,17 @@
 import tkinter as tk
 import copy
+from collections import deque
 
 CELL_SIZE = 50
 MOVES = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
-maze_map = [["A", 0, 0, 0, 0, 0, 0],
+maze_map = [
+    ["A", 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, "B"]]
+    [0, 0, 0, 0, 0, 0, "B"],
+]
 
 
 def find_all_paths(maze, solution=None, start=None, final=None):
@@ -42,11 +45,10 @@ def find_all_paths(maze, solution=None, start=None, final=None):
             elif cell == "B":
                 final.append(solution + [(point[0], point[1])])
             elif cell == 0:
-                maze[start[0]][start[1]] = 1
-                solution.append((point[0], point[1]))
-                find_all_paths(maze, solution, point, final)
-                solution.pop()
-                maze[start[0]][start[1]] = 0
+                maze_copy = copy.deepcopy(maze)
+                maze_copy[start[0]][start[1]] = 1
+                new_solution = solution + [(point[0], point[1])]
+                find_all_paths(maze_copy, new_solution, point, final)
     return final
 
 
@@ -189,15 +191,13 @@ class MazeVisualizer:
                         self.steps.append(("final", copy.deepcopy(path)))
                         final.append(path)
                     elif cell == 0:
-                        maze[start[0]][start[1]] = 1
-                        solution.append((point[0], point[1]))
-                        self.steps.append(("step", copy.deepcopy(solution)))
-                        tracer(maze, solution, point, final)
-                        solution.pop()
-                        self.steps.append(("backtrack", copy.deepcopy(solution)))
-                        maze[start[0]][start[1]] = 0
+                        maze_copy = copy.deepcopy(maze)
+                        maze_copy[start[0]][start[1]] = 1
+                        new_solution = solution + [(point[0], point[1])]
+                        self.steps.append(("step", copy.deepcopy(new_solution)))
+                        tracer(maze_copy, new_solution, point, final)
 
-        tracer(copy.deepcopy(self.maze))
+        tracer(copy.deepcopy(self.visual_maze))
 
     def start_analysis(self):
         self.prepare_visual_steps()
@@ -212,7 +212,15 @@ class MazeVisualizer:
         else:
             final_paths = [path for kind, path in self.steps if kind == "final"]
             if final_paths:
-                self.draw_maze(path=final_paths[-1], color="green")
+                shortest_path = min(final_paths, key=lambda x: len(x))
+                self.draw_maze(path=shortest_path, color="green")
+            else:
+                self.canvas.create_text(
+                    self.canvas.winfo_width() // 2,
+                    self.canvas.winfo_height() // 2,
+                    text="No Path Found!",
+                    fill="red",
+                    font=("Arial", 20, "bold"),)
 
 
 if __name__ == "__main__":
