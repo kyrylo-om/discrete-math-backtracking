@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Graph with Slider</title>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script src="graph_data.js"></script>
+</head>
+
+<body>
+    <div id="mynetwork" style="height: 600px; border: 1px solid lightgray; margin-top: 10px;"></div>
+    <div style="display: flex; align-items: center;">
+        <h2 style="margin: 0; margin-right: 1rem;">Viewing step</h2>
+        <input type="number" id="stepLabel" value="0" style="font-weight: bold; font-size: 1.5rem; width: 4rem">
+    </div>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+        <button onclick="toggleAnimation()" style="font-size: 1.5rem; padding: 0.5rem 1rem;">▶</button>
+        <input type="range" min="0" max="0" value="0" id="stepSlider" style="width: 80%;">
+    </div></div>
+
+    <script>
+        const container = document.getElementById("mynetwork");
+        const stepLabel = document.getElementById("stepLabel");
+        const slider = document.getElementById("stepSlider");
+
+        let network = null;
+
+        function loadGraph() {
+            const data = {
+                nodes: new vis.DataSet(graph.nodes),
+                edges: new vis.DataSet(graph.edges)
+            };
+            const options = {
+                nodes: {
+                    shape: "dot",
+                    size: 20,
+                    font: {
+                        size: 16,
+                        color: "black",
+                    },
+                    borderWidth: 2
+                },
+                edges: {
+                    width: 2,
+                    color: {
+                        color: "#848484",
+                    }
+                },
+                physics: {
+                    forceAtlas2Based: {
+                        gravitationalConstant: -50,
+                        centralGravity: 0.01,
+                        springLength: 100,
+                        springConstant: 0.08
+                    },
+                    solver: "forceAtlas2Based",
+                    timestep: 0.35,
+                    stabilization: { iterations: 150 }
+                }
+            };
+            network = new vis.Network(container, data, options);
+        }
+
+        function loadStep(step) {
+            network.body.data.nodes.update(graph.nodes.map(node => ({
+                ...node,
+                group: history[step][node.id]
+            })));
+            stepLabel.value = step;
+            slider.value = step;
+        }
+
+        let intervalId = null;
+
+        function toggleAnimation() {
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+                return;
+            }
+            intervalId = setInterval(() => {
+                let currentStep = parseInt(stepLabel.value);
+                if (currentStep >= history.length - 1) {
+                    clearInterval(intervalId);
+                    intervalId = null;
+                    return;
+                }
+                loadStep(currentStep + 1);
+            }, 10);
+        }
+
+        slider.max = history.length - 1;
+
+        loadGraph();
+        loadStep(0);
+
+        slider.oninput = function () {
+            loadStep(parseInt(this.value));
+        };
+        stepLabel.oninput = function () {
+            loadStep(parseInt(this.value));
+        };
+    </script>
+</body>
+
+</html>
