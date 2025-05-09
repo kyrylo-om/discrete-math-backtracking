@@ -17,10 +17,9 @@ def main():
     parser.add_argument("-v", "--visualization", action="store_true")
 
     parser.add_argument("-t", "--test", action="store_true")
-    parser.add_argument("--sizes", type=int, nargs="+", help="List of board sizes for testing.")
-    parser.add_argument("--iters", type=int, help="Number of iterations per test.")
-    parser.add_argument("--fill_chances", type=float, nargs="+",
-                        help="List of fill chances for testing.")
+    parser.add_argument("--sizes", type=int, nargs="+")
+    parser.add_argument("--iters", type=int)
+    parser.add_argument("--fill_chances", type=float, nargs="+")
     parser.add_argument("--output_file", type=str)
 
     args = parser.parse_args()
@@ -30,7 +29,7 @@ def main():
             print("Error: --file, --size, or --visualization may not be used when running tests.")
             return
 
-        if not all([args.sizes, args.iters, args.fill_chances]):
+        if not all([args.sizes, args.iters, args.fill_chances, args.output_file]):
             print("Error: --sizes, --iters, --fill_chances and --output_file "
                   "must be specified when using --test.")
             return
