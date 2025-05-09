@@ -216,3 +216,4 @@ class BacktrackingVisualizer:
         self.root.update()
 if __name__ == "__main__":
     BacktrackingVisualizer()
+
