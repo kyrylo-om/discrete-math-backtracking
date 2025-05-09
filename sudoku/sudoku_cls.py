@@ -49,23 +49,6 @@ class Sudoku:
     def __getitem__(self, index):
         return self.board[index]
 
-    def is_move_valid(self, row, col, num):
-        """
-        Determines wether a move is valid by checking the row, colum and grid of the cell.
-        """
-        for i in range(self.size):
-            if num in (self[row][i], self[i][col]):
-                return False
-
-        start_row = row // self.grid_height * self.grid_height
-        start_col = col // self.grid_width * self.grid_width
-
-        for i in range(self.grid_height):
-            for j in range(self.grid_width):
-                if self[start_row + i][start_col + j] == num:
-                    return False
-        return True
-
     def get_valid_numbers(self, row, col):
         """
         Returns a list of all valid numbers for the given cell.
@@ -199,27 +182,17 @@ class Sudoku:
         """
         self.clear()
 
+        self.generate_cell_order()
+
         self.solve(random_fill=True)
 
-        self.board = [[cell if random() < fill_chance else None for cell in row] for row in self.board]
-
-    def clean_board(self):
-        """
-        Cleans the self.board from 0's, used for the random fill method.
-        """
-        self.board = [[cell or None for cell in row] for row in self]
+        self.board = [[cell if random() < fill_chance else None for cell in row] for row in self]
 
     def clear(self, value=None):
         """
         Sets all cells to value which is None by default.
         """
         self.board = [[value for _ in range(self.size)] for _ in range(self.size)]
-
-    def filled_cell_count(self):
-        """
-        Returns the amount of filled cells in a sudoku board.
-        """
-        return sum(self.board[i][j] is not None for j in range(self.size) for i in range(self.size))
 
     def __repr__(self):
         cell_width = ceil(log10(self.size + 1))
@@ -271,6 +244,7 @@ def test_sudoku(sizes: list[int], iters: int, fill_chances: list[int]):
                 sudoku.fill(fill)
                 board_keep = deepcopy(sudoku.board)
 
+                sudoku.generate_cell_order()
                 start = time.time()
                 sudoku.solve()
                 end = time.time()-start
@@ -279,6 +253,7 @@ def test_sudoku(sizes: list[int], iters: int, fill_chances: list[int]):
 
                 sudoku.board = deepcopy(board_keep)
 
+                sudoku.generate_cell_order()
                 start = time.time()
                 sudoku.solve(greedy=True)
                 end = time.time()-start
@@ -289,6 +264,6 @@ def test_sudoku(sizes: list[int], iters: int, fill_chances: list[int]):
 
 
 if __name__ == "__main__":
-    s = Sudoku(16)
+    s = Sudoku(9)
     s.fill(0.1)
     print(s)
