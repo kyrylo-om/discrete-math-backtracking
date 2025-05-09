@@ -247,4 +247,4 @@ def parse_maze_file(file_path):
     return maze
 
 if __name__ == "__main__":
-    MazeVisualizer()
+    MazeVisualizer(DEFAULT_MAZE)
